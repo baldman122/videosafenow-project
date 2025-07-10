@@ -4,12 +4,12 @@
 [build]
   # This command tells Netlify to install the libraries from your requirements.txt file.
   command = "pip install -r requirements.txt"
-  
-  # This tells Netlify where to find your function code.
-  functions = "netlify/functions"
-  
   # This tells Netlify that the index.html is in the root of the project.
   publish = "."
+
+# This section explicitly configures the functions directory.
+[functions]
+  directory = "netlify/functions"
 
 # This section sets up the URL for your function.
 [[redirects]]
