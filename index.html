@@ -14,46 +14,31 @@
         html { scroll-behavior: smooth; }
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .hero-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .focus-ring-brand { --tw-ring-color: rgba(102, 126, 234, 0.5); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { animation: fadeIn 0.6s ease-in-out forwards; }
         .analysis-timeline-bar div {
             transition: background-color 0.3s ease, width 0.5s ease;
-            white-space: nowrap; overflow: hidden;
-            color: white; font-size: 10px; font-weight: 600;
+            white-space: nowrap; overflow: hidden; color: white; font-size: 10px; font-weight: 600;
             display: flex; align-items: center; justify-content: center;
         }
-        .progress-bar-inner {
-            transition: width 0.4s ease-in-out;
-        }
+        .progress-bar-inner { transition: width 0.4s ease-in-out; }
     </style>
 </head>
 <body class="text-gray-800">
 
-    <!-- Header -->
     <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
-        <nav class="container mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <a href="#" class="text-2xl font-bold text-gray-800">VideoSafe<span class="text-indigo-600">Now</span>.tech</a>
-                <div><a href="#analyzer" class="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300">Check a Video</a></div>
-            </div>
-        </nav>
+        <nav class="container mx-auto px-6 py-4"><div class="flex items-center justify-between"><a href="#" class="text-2xl font-bold text-gray-800">VideoSafe<span class="text-indigo-600">Now</span>.tech</a><div><a href="#analyzer" class="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300">Check a Video</a></div></div></nav>
     </header>
 
-    <!-- Main Content -->
     <main>
-        <!-- Hero Section -->
         <section class="hero-gradient text-white pt-24 pb-20 md:pt-32 md:pb-28">
             <div class="container mx-auto px-6 text-center">
                 <h1 class="text-4xl md:text-6xl font-extrabold leading-tight tracking-tight mb-4">True Frame-by-Frame Analysis.</h1>
-                <p class="text-lg md:text-xl text-indigo-200 max-w-3xl mx-auto mb-8">
-                    Our engine analyzes the full video for photosensitive epilepsy triggers based on established safety guidelines.
-                </p>
+                <p class="text-lg md:text-xl text-indigo-200 max-w-3xl mx-auto mb-8">Our engine analyzes the full video for photosensitive epilepsy triggers based on established safety guidelines.</p>
                 <a href="#analyzer" class="inline-block px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg shadow-lg hover:bg-gray-100 transform hover:scale-105 transition-transform duration-300">Get Started</a>
             </div>
         </section>
 
-        <!-- Analyzer Section -->
         <section id="analyzer" class="py-20 bg-gray-50">
             <div class="container mx-auto px-6">
                 <div class="max-w-3xl mx-auto text-center"><h2 class="text-3xl md:text-4xl font-bold mb-4">Analyze a YouTube Video</h2><p class="text-gray-600 mb-8">Paste the full YouTube video URL below to begin the analysis.</p></div>
@@ -68,12 +53,10 @@
                         </div>
                     </form>
                 </div>
-                <!-- Result Display Area -->
                 <div id="result-container" class="mt-12 max-w-2xl mx-auto"></div>
             </div>
         </section>
         
-        <!-- Disclaimer Section -->
         <section class="bg-yellow-50 border-t border-b border-yellow-200 py-8">
             <div class="container mx-auto px-6 text-center">
                 <h3 class="font-bold text-yellow-800 text-lg mb-2">Important Disclaimer</h3>
@@ -82,20 +65,14 @@
         </section>
     </main>
 
-    <!-- Footer -->
     <footer class="bg-gray-800 text-white py-12">
-        <div class="container mx-auto px-6 text-center">
-            <p>&copy; 2025 VideoSafeNow.tech. All Rights Reserved.</p>
-            <p class="text-sm text-gray-400 mt-2">Making video content more accessible and safer for everyone.</p>
-        </div>
+        <div class="container mx-auto px-6 text-center"><p>&copy; 2025 VideoSafeNow.tech. All Rights Reserved.</p><p class="text-sm text-gray-400 mt-2">Making video content more accessible and safer for everyone.</p></div>
     </footer>
 
     <script>
         const form = document.getElementById('video-form');
         const urlInput = document.getElementById('youtube-url');
         const analyzeButton = document.getElementById('analyze-button');
-        const buttonText = document.getElementById('button-text');
-        const spinner = document.getElementById('spinner');
         const resultContainer = document.getElementById('result-container');
         let pollingInterval;
 
@@ -106,7 +83,6 @@
             showChecklistUI();
 
             try {
-                // Step 1: Call the 'start-analysis' endpoint to begin the job
                 const startResponse = await fetch('/api/start-analysis', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -119,19 +95,14 @@
                 const jobId = startResult.jobId;
                 updateChecklistItem('info', 'complete', `Job ID: ${jobId}`);
                 updateChecklistItem('analyzing', 'active');
-
-                // Step 2: Poll the 'check-status' endpoint for updates
                 pollForStatus(jobId);
-
             } catch (error) {
-                console.error("Failed to start analysis:", error);
                 displayResult({ status: 'error', message: 'Failed to Start Analysis', details: error.message });
             }
         });
         
         function pollForStatus(jobId) {
             if (pollingInterval) clearInterval(pollingInterval);
-
             pollingInterval = setInterval(async () => {
                 try {
                     const statusResponse = await fetch(`/api/check-status?id=${jobId}`);
@@ -151,10 +122,9 @@
                     }
                 } catch (error) {
                     clearInterval(pollingInterval);
-                    console.error("Polling error:", error);
                     displayResult({ status: 'error', message: 'Connection Lost', details: 'Lost connection to the analysis server.' });
                 }
-            }, 3000); // Poll every 3 seconds
+            }, 3000);
         }
 
         function showChecklistUI() {
@@ -162,26 +132,11 @@
                 <div class="fade-in bg-white p-6 rounded-xl shadow-lg">
                     <h3 class="text-xl font-bold text-center mb-4">Analysis in Progress...</h3>
                     <ul class="space-y-3">
-                        <li id="status-info" class="flex items-center text-gray-500">
-                            <svg class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <span class="status-text">Submitting analysis request</span>
-                        </li>
-                        <li id="status-analyzing" class="flex items-center text-gray-500">
-                            <svg class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                            <div>
-                                <span class="status-text">Analyzing video frames for Harding Test compliance</span>
-                                <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1 hidden">
-                                    <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full progress-bar-inner" style="width: 0%"></div>
-                                </div>
-                            </div>
-                        </li>
-                        <li id="status-finalizing" class="flex items-center text-gray-500">
-                            <svg class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <span class="status-text">Finalizing results</span>
-                        </li>
+                        <li id="status-info" class="flex items-center text-gray-500"><svg class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="status-text">Submitting analysis request</span></li>
+                        <li id="status-analyzing" class="flex items-center text-gray-500"><svg class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg><div><span class="status-text">Analyzing video frames for Harding Test compliance</span><div class="w-full bg-gray-200 rounded-full h-2.5 mt-1 hidden"><div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full progress-bar-inner" style="width: 0%"></div></div></div></li>
+                        <li id="status-finalizing" class="flex items-center text-gray-500"><svg class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="status-text">Finalizing results</span></li>
                     </ul>
-                </div>
-            `;
+                </div>`;
             resultContainer.innerHTML = checklistHTML;
             updateChecklistItem('info', 'active');
         }
@@ -211,9 +166,9 @@
         }
 
         function setLoadingState(isLoading) {
-            analyzeButton.disabled = isLoading;
-            buttonText.classList.toggle('hidden', isLoading);
-            spinner.classList.toggle('hidden', !isLoading);
+            document.getElementById('analyze-button').disabled = isLoading;
+            document.getElementById('button-text').classList.toggle('hidden', isLoading);
+            document.getElementById('spinner').classList.toggle('hidden', !isLoading);
         }
 
         function displayResult(result) {
