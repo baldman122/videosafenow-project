@@ -8,10 +8,6 @@
 [functions]
   # This tells Netlify where your JavaScript function code lives.
   directory = "netlify/functions"
-
-# This redirect rule is essential. It connects your website's API calls 
-# to the actual function files.
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
+  # This line is the key fix. It forces Netlify to include all
+  # installed dependencies with your functions.
+  included_files = ["node_modules/**"]
