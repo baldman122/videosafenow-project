@@ -1,7 +1,8 @@
 {
   "name": "videosafenow-backend",
   "version": "1.0.0",
+  "description": "Backend for videosafenow",
   "dependencies": {
-    "ytdl-core": "^4.11.5"
+    "play-dl": "^1.9.7"
   }
 }
