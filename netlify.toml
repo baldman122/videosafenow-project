@@ -1,7 +1,15 @@
 [build]
-  functions = "netlify/functions"
+  # The publish directory is the root of your project where index.html lives.
   publish = "."
 
+[functions]
+  # This specifies the directory where your function files are.
+  directory = "netlify/functions"
+  # This line is the key fix. It tells Netlify to use the 'esbuild' bundler,
+  # which is excellent at packaging dependencies like 'play-dl'.
+  node_bundler = "esbuild"
+
+# This redirect rule connects your website's API calls to the function.
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
