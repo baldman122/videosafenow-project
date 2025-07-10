@@ -45,9 +45,9 @@
         <!-- Hero Section -->
         <section class="hero-gradient text-white pt-24 pb-20 md:pt-32 md:pb-28">
             <div class="container mx-auto px-6 text-center">
-                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight tracking-tight mb-4">Real-Time Video Analysis.</h1>
+                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight tracking-tight mb-4">True Frame-by-Frame Analysis.</h1>
                 <p class="text-lg md:text-xl text-indigo-200 max-w-3xl mx-auto mb-8">
-                    Our engine analyzes video metadata for photosensitive epilepsy triggers based on established safety guidelines.
+                    Our engine analyzes the full video for photosensitive epilepsy triggers based on established safety guidelines.
                 </p>
                 <a href="#analyzer" class="inline-block px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg shadow-lg hover:bg-gray-100 transform hover:scale-105 transition-transform duration-300">Get Started</a>
             </div>
@@ -97,56 +97,65 @@
         const buttonText = document.getElementById('button-text');
         const spinner = document.getElementById('spinner');
         const resultContainer = document.getElementById('result-container');
+        let pollingInterval;
 
         form.addEventListener('submit', async function(event) {
             event.preventDefault();
             setLoadingState(true);
-            
-            // Show the checklist UI immediately
+            resultContainer.innerHTML = '';
             showChecklistUI();
 
-            // Simulate a short delay for fetching info
-            setTimeout(() => {
-                updateChecklistItem('info', 'complete');
-                updateChecklistItem('analyzing', 'active');
-                updateProgressBar(10); // Show a little progress
-            }, 750);
-
-            // This is the URL for the Netlify function.
-            const functionURL = '/api/analyze'; 
-
             try {
-                const response = await fetch(functionURL, {
+                // Step 1: Call the 'start-analysis' endpoint to begin the job
+                const startResponse = await fetch('/api/start-analysis', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ url: urlInput.value }) 
                 });
+                const startResult = await startResponse.json();
 
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.details || 'An unknown error occurred.');
-                }
+                if (!startResponse.ok) throw new Error(startResult.message || 'Failed to start analysis.');
                 
-                // Update checklist to show completion
-                updateChecklistItem('analyzing', 'complete');
-                updateProgressBar(100);
-                updateChecklistItem('finalizing', 'active');
+                const jobId = startResult.jobId;
+                updateChecklistItem('info', 'complete', `Job ID: ${jobId}`);
+                updateChecklistItem('analyzing', 'active');
 
-                // Short delay before showing final result for better UX
-                setTimeout(() => {
-                    displayResult(result);
-                }, 500);
+                // Step 2: Poll the 'check-status' endpoint for updates
+                pollForStatus(jobId);
 
             } catch (error) {
-                console.error("Failed to fetch analysis:", error);
-                displayResult({ 
-                    status: 'error', 
-                    message: 'Analysis Service Unavailable', 
-                    details: 'Could not connect to the backend server. Please try again later.' 
-                });
+                console.error("Failed to start analysis:", error);
+                displayResult({ status: 'error', message: 'Failed to Start Analysis', details: error.message });
             }
         });
+        
+        function pollForStatus(jobId) {
+            if (pollingInterval) clearInterval(pollingInterval);
+
+            pollingInterval = setInterval(async () => {
+                try {
+                    const statusResponse = await fetch(`/api/check-status?id=${jobId}`);
+                    const statusResult = await statusResponse.json();
+
+                    if (statusResult.status === 'processing') {
+                        updateProgressBar(statusResult.progress);
+                    } else if (statusResult.status === 'complete') {
+                        clearInterval(pollingInterval);
+                        updateChecklistItem('analyzing', 'complete');
+                        updateProgressBar(100);
+                        updateChecklistItem('finalizing', 'active');
+                        setTimeout(() => displayResult(statusResult.result), 500);
+                    } else if (statusResult.status === 'failed') {
+                        clearInterval(pollingInterval);
+                        displayResult({ status: 'error', message: 'Analysis Failed', details: statusResult.error });
+                    }
+                } catch (error) {
+                    clearInterval(pollingInterval);
+                    console.error("Polling error:", error);
+                    displayResult({ status: 'error', message: 'Connection Lost', details: 'Lost connection to the analysis server.' });
+                }
+            }, 3000); // Poll every 3 seconds
+        }
 
         function showChecklistUI() {
             const checklistHTML = `
@@ -155,12 +164,12 @@
                     <ul class="space-y-3">
                         <li id="status-info" class="flex items-center text-gray-500">
                             <svg class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <span>Fetching video information</span>
+                            <span class="status-text">Submitting analysis request</span>
                         </li>
                         <li id="status-analyzing" class="flex items-center text-gray-500">
                             <svg class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                             <div>
-                                <span>Analyzing video metadata for keywords</span>
+                                <span class="status-text">Analyzing video frames for Harding Test compliance</span>
                                 <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1 hidden">
                                     <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full progress-bar-inner" style="width: 0%"></div>
                                 </div>
@@ -168,7 +177,7 @@
                         </li>
                         <li id="status-finalizing" class="flex items-center text-gray-500">
                             <svg class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <span>Finalizing results</span>
+                            <span class="status-text">Finalizing results</span>
                         </li>
                     </ul>
                 </div>
@@ -177,10 +186,12 @@
             updateChecklistItem('info', 'active');
         }
 
-        function updateChecklistItem(id, status) {
+        function updateChecklistItem(id, status, text = null) {
             const item = document.getElementById(`status-${id}`);
             if (!item) return;
             const icon = item.querySelector('svg');
+            const span = item.querySelector('.status-text');
+            if (text) span.textContent = text;
             item.classList.remove('text-gray-500', 'text-indigo-600', 'text-green-600');
             icon.innerHTML = '';
             if (status === 'active') {
@@ -195,9 +206,7 @@
         function updateProgressBar(percentage) {
             const progressBarContainer = document.querySelector('#status-analyzing .w-full');
             const progressBar = document.getElementById('progress-bar');
-            if (progressBarContainer.classList.contains('hidden')) {
-                progressBarContainer.classList.remove('hidden');
-            }
+            if (progressBarContainer.classList.contains('hidden')) progressBarContainer.classList.remove('hidden');
             progressBar.style.width = `${percentage}%`;
         }
 
