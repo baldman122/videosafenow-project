@@ -1,15 +1,18 @@
 # This is the final, definitive configuration for a JavaScript project on Netlify.
-# It uses the 'zisi' bundler which is more robust for including dependencies.
+# It explicitly tells Netlify to install dependencies and then package them.
 
 [build]
+  # This command ensures all dependencies from package.json are installed.
+  command = "npm install"
   # This tells Netlify where your main website files are.
   publish = "."
 
 [functions]
   # This tells Netlify where your JavaScript function code lives.
   directory = "netlify/functions"
-  # This line is the key fix. It switches to a more robust bundler.
-  node_bundler = "zisi"
+  # This line is the key fix. It forces Netlify to include all
+  # installed dependencies with your functions.
+  included_files = ["node_modules/**"]
 
 # This redirect rule is essential. It connects your website's API calls 
 # to the actual function files.
