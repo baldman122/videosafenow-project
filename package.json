@@ -1,8 +1,8 @@
 {
   "name": "videosafenow-backend",
   "version": "1.0.0",
-  "description": "Backend for videosafenow",
+  "description": "Coordinator functions for videosafenow",
   "dependencies": {
-    "googleapis": "^126.0.1"
+    "node-fetch": "^2.6.7" 
   }
 }
