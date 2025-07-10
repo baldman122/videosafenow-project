@@ -1,12 +1,11 @@
-# This is the final, simplified configuration for Netlify.
-# It relies on Netlify's automatic dependency installation.
+# This is the final, simplified configuration for a JavaScript project on Netlify.
 
 [build]
-  # The publish directory is the root of your project where index.html lives.
+  # This tells Netlify where your main website files are.
   publish = "."
 
 [functions]
-  # This tells Netlify where to find the function files.
+  # This tells Netlify where your JavaScript function code lives.
   directory = "netlify/functions"
 
 # This redirect rule connects your website's API calls to the function.
