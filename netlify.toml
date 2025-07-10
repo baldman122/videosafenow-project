@@ -1,12 +1,13 @@
 [build]
+  # This command explicitly tells Netlify to install the packages from package.json.
+  command = "npm install"
   # The publish directory is the root of your project where index.html lives.
   publish = "."
 
 [functions]
   # This specifies the directory where your function files are.
   directory = "netlify/functions"
-  # This line is the key fix. We are switching to the 'zisi' bundler,
-  # which is more robust at handling complex dependencies like 'play-dl'.
+  # The 'zisi' bundler is more robust at handling complex dependencies.
   node_bundler = "zisi"
 
 # This redirect rule connects your website's API calls to the function.
