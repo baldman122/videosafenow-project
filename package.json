@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Coordinator functions for videosafenow",
   "dependencies": {
-    "node-fetch": "^2.6.7" 
+    "node-fetch": "^2.6.7",
+    "@azure/data-tables": "^13.1.1"
   }
 }
