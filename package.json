@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "description": "Backend for videosafenow",
   "dependencies": {
-    "play-dl": "^1.9.7"
+    "googleapis": "^126.0.1"
   }
 }
