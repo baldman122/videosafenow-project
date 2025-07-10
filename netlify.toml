@@ -5,8 +5,10 @@
 [functions]
   # This specifies the directory where your function files are.
   directory = "netlify/functions"
-  # This line is the key fix. It tells Netlify to use the 'esbuild' bundler,
-  # which is excellent at packaging dependencies like 'play-dl'.
+  # This line is the key fix. It tells the bundler to not include
+  # 'play-dl' in the function bundle, and instead make it available
+  # at runtime. This resolves the build error.
+  external_node_modules = ["play-dl"]
   node_bundler = "esbuild"
 
 # This redirect rule connects your website's API calls to the function.
