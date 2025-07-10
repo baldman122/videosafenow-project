@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoSafeNow.tech - Epilepsy-Safe Video Checker</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .hero-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .focus-ring-brand { --tw-ring-color: rgba(102, 126, 234, 0.5); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.6s ease-in-out forwards; }
+        .analysis-timeline-bar div {
+            transition: background-color 0.3s ease; white-space: nowrap; overflow: hidden;
+            color: white; font-size: 10px; font-weight: 600;
+            display: flex; align-items: center; justify-content: center;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="#" class="text-2xl font-bold text-gray-800">VideoSafe<span class="text-indigo-600">Now</span>.tech</a>
+                <div><a href="#analyzer" class="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300">Check a Video</a></div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-gradient text-white pt-24 pb-20 md:pt-32 md:pb-28">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight tracking-tight mb-4">Watch with Confidence.</h1>
+                <p class="text-lg md:text-xl text-indigo-200 max-w-3xl mx-auto mb-8">
+                    Our tool analyzes YouTube videos for flashing lights and rapid cuts, helping to create a safer viewing experience for individuals with photosensitive epilepsy.
+                </p>
+                <a href="#analyzer" class="inline-block px-8 py-4 bg-white text-indigo-600 font-bold rounded-lg shadow-lg hover:bg-gray-100 transform hover:scale-105 transition-transform duration-300">Get Started</a>
+            </div>
+        </section>
+
+        <!-- Analyzer Section -->
+        <section id="analyzer" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <div class="max-w-3xl mx-auto text-center"><h2 class="text-3xl md:text-4xl font-bold mb-4">Analyze a YouTube Video</h2><p class="text-gray-600 mb-8">Paste the full YouTube video URL below. Our server will analyze it and provide a safety assessment.</p></div>
+                <div class="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+                    <form id="video-form">
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <input type="url" id="youtube-url" class="flex-grow w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus-ring-brand transition-shadow" placeholder="https://www.youtube.com/watch?v=..." required>
+                            <button type="submit" id="analyze-button" class="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-300 flex items-center justify-center">
+                                <span id="button-text">Analyze</span>
+                                <svg id="spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div id="result-container" class="mt-12 max-w-2xl mx-auto"></div>
+            </div>
+        </section>
+        
+        <!-- Disclaimer Section -->
+        <section class="bg-yellow-50 border-t border-b border-yellow-200 py-8">
+            <div class="container mx-auto px-6 text-center">
+                <h3 class="font-bold text-yellow-800 text-lg mb-2">Important Disclaimer</h3>
+                <p class="text-yellow-700 text-sm max-w-4xl mx-auto">This tool is provided for informational purposes only and is not a substitute for professional medical advice. The analysis is automated and cannot guarantee 100% accuracy. A "safe" rating does not eliminate all risk. Users with photosensitive conditions should always exercise caution and consult with a healthcare provider. VideoSafeNow.tech is not liable for any issues arising from the use of this service.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 VideoSafeNow.tech. All Rights Reserved.</p>
+            <p class="text-sm text-gray-400 mt-2">Making video content more accessible and safer for everyone.</p>
+        </div>
+    </footer>
+
+    <script>
+        const form = document.getElementById('video-form');
+        const urlInput = document.getElementById('youtube-url');
+        const analyzeButton = document.getElementById('analyze-button');
+        const buttonText = document.getElementById('button-text');
+        const spinner = document.getElementById('spinner');
+        const resultContainer = document.getElementById('result-container');
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            setLoadingState(true);
+            resultContainer.innerHTML = '';
+
+            // This is the new, simpler URL for the Netlify function.
+            const functionURL = '/api/analyze'; 
+
+            try {
+                const response = await fetch(functionURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: urlInput.value }) 
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'An unknown error occurred.');
+                }
+                
+                displayResult(result);
+
+            } catch (error) {
+                console.error("Failed to fetch analysis:", error);
+                displayResult({ 
+                    status: 'error', 
+                    message: 'Analysis Service Unavailable', 
+                    details: 'Could not connect to the backend server. Please try again later.' 
+                });
+            } finally {
+                setLoadingState(false);
+            }
+        });
+
+        function setLoadingState(isLoading) {
+            analyzeButton.disabled = isLoading;
+            buttonText.classList.toggle('hidden', isLoading);
+            spinner.classList.toggle('hidden', !isLoading);
+        }
+
+        function displayResult(result) {
+            if (result.status === 'error') {
+                resultContainer.innerHTML = `<div class="fade-in bg-gray-100 text-gray-800 p-6 rounded-lg shadow-md"><div class="flex items-center"><div class="flex-shrink-0"><svg class="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg></div><div class="ml-4"><h3 class="text-xl font-bold text-gray-600">${result.message}</h3><p class="mt-1 text-sm">${result.details || ''}</p></div></div></div>`;
+                return;
+            }
+
+            let overallIcon, overallTitleColor;
+            if (result.status === 'safe') {
+                overallTitleColor = 'text-green-600';
+                overallIcon = `<svg class="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            } else {
+                overallTitleColor = 'text-red-600';
+                overallIcon = `<svg class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`;
+            }
+
+            const timelineSegmentsHTML = result.riskSegments.map(segment => {
+                const width = ((segment.end - segment.start) / result.duration) * 100;
+                let colorClass = ''; let label = '';
+                switch (segment.risk) {
+                    case 'high': colorClass = 'bg-red-500'; label = 'High'; break;
+                    case 'medium': colorClass = 'bg-yellow-500'; label = 'Med'; break;
+                    default: colorClass = 'bg-green-500'; label = 'Low'; break;
+                }
+                return `<div class="${colorClass}" style="width: ${width}%;" title="${segment.risk.charAt(0).toUpperCase() + segment.risk.slice(1)} Risk (${segment.start}s - ${segment.end}s)">${width > 8 ? label : ''}</div>`;
+            }).join('');
+
+            const resultHTML = `
+                <div class="fade-in bg-white p-6 rounded-xl shadow-lg">
+                    <img src="${result.thumbnailUrl}" alt="Video Thumbnail" class="rounded-lg mb-6 w-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/1280x720/cccccc/ffffff?text=Thumbnail+Not+Available';">
+                    <div class="flex items-start"><div class="flex-shrink-0 mt-1">${overallIcon}</div><div class="ml-4"><h3 class="text-xl font-bold ${overallTitleColor}">${result.message}</h3><p class="mt-1 text-gray-600">${result.details}</p></div></div>
+                    <div class="mt-6">
+                        <h4 class="font-semibold text-gray-700 mb-2">Video Risk Timeline</h4>
+                        <div class="w-full h-6 bg-gray-200 rounded-full flex overflow-hidden border border-gray-300 analysis-timeline-bar">${timelineSegmentsHTML}</div>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1 px-1"><span>0:00</span><span>${Math.floor(result.duration / 60)}:${(result.duration % 60).toString().padStart(2, '0')}</span></div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-200 flex items-center justify-center space-x-4 text-sm text-gray-600">
+                        <div class="flex items-center"><span class="h-3 w-3 rounded-full bg-green-500 mr-2"></span>Low Risk</div>
+                        <div class="flex items-center"><span class="h-3 w-3 rounded-full bg-yellow-500 mr-2"></span>Medium Risk</div>
+                        <div class="flex items-center"><span class="h-3 w-3 rounded-full bg-red-500 mr-2"></span>High Risk</div>
+                    </div>
+                </div>`;
+            resultContainer.innerHTML = resultHTML;
+        }
+    </script>
+</body>
+</html>

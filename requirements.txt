@@ -1,0 +1,4 @@
+opencv-python-headless
+numpy
+pytube
+google-api-python-client
