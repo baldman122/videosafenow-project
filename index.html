@@ -97,41 +97,124 @@
         const buttonText = document.getElementById('button-text');
         const spinner = document.getElementById('spinner');
         const resultContainer = document.getElementById('result-container');
+        let pollingInterval;
 
         form.addEventListener('submit', async function(event) {
             event.preventDefault();
             setLoadingState(true);
             resultContainer.innerHTML = '';
 
-            // This is the URL for the Netlify function.
-            const functionURL = '/api/analyze'; 
-
-            try {
-                const response = await fetch(functionURL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: urlInput.value }) 
-                });
-
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.details || 'An unknown error occurred.');
-                }
-                
-                displayResult(result);
-
-            } catch (error) {
-                console.error("Failed to fetch analysis:", error);
-                displayResult({ 
-                    status: 'error', 
-                    message: 'Analysis Service Unavailable', 
-                    details: 'Could not connect to the backend server. Please try again later.' 
-                });
-            } finally {
-                setLoadingState(false);
-            }
+            // This is the new UI that shows a live checklist and progress bar.
+            // In the future, this will be powered by a real multi-step backend process.
+            startSimulatedAnalysis();
         });
+
+        function startSimulatedAnalysis() {
+            showChecklistUI();
+
+            let progress = 0;
+            const stages = ['info', 'analyzing', 'finalizing', 'done'];
+            let currentStage = 0;
+
+            if (pollingInterval) clearInterval(pollingInterval);
+
+            pollingInterval = setInterval(() => {
+                progress += 5;
+
+                if (progress >= 20 && currentStage === 0) {
+                    updateChecklistItem('info', 'complete');
+                    updateChecklistItem('analyzing', 'active');
+                    currentStage++;
+                }
+                if (progress > 20 && progress < 95) {
+                    const analysisProgress = ((progress - 20) / 75) * 100;
+                    updateProgressBar(analysisProgress);
+                }
+                if (progress >= 95 && currentStage === 1) {
+                    updateChecklistItem('analyzing', 'complete');
+                    updateProgressBar(100);
+                    updateChecklistItem('finalizing', 'active');
+                    currentStage++;
+                }
+                if (progress >= 100) {
+                    updateChecklistItem('finalizing', 'complete');
+                    clearInterval(pollingInterval);
+                    displayFinalResult();
+                }
+            }, 250);
+        }
+
+        function showChecklistUI() {
+            const checklistHTML = `
+                <div class="fade-in bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-bold text-center mb-4">Analysis in Progress...</h3>
+                    <ul class="space-y-3">
+                        <li id="status-info" class="flex items-center text-gray-500">
+                            <svg class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>Fetching video information</span>
+                        </li>
+                        <li id="status-analyzing" class="flex items-center text-gray-500">
+                            <svg class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                            <div>
+                                <span>Analyzing video frames for Harding Test compliance</span>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1 hidden">
+                                    <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full progress-bar-inner" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li id="status-finalizing" class="flex items-center text-gray-500">
+                            <svg class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>Finalizing results</span>
+                        </li>
+                    </ul>
+                </div>
+            `;
+            resultContainer.innerHTML = checklistHTML;
+            updateChecklistItem('info', 'active');
+        }
+
+        function updateChecklistItem(id, status) {
+            const item = document.getElementById(`status-${id}`);
+            if (!item) return;
+            const icon = item.querySelector('svg');
+            item.classList.remove('text-gray-500', 'text-indigo-600', 'text-green-600');
+            icon.innerHTML = '';
+            if (status === 'active') {
+                item.classList.add('text-indigo-600');
+                icon.innerHTML = `<path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin origin-center"/>`;
+            } else if (status === 'complete') {
+                item.classList.add('text-green-600');
+                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />`;
+            }
+        }
+
+        function updateProgressBar(percentage) {
+            const progressBarContainer = document.querySelector('#status-analyzing .w-full');
+            const progressBar = document.getElementById('progress-bar');
+            if (progressBarContainer.classList.contains('hidden')) {
+                progressBarContainer.classList.remove('hidden');
+            }
+            progressBar.style.width = `${percentage}%`;
+        }
+
+        function displayFinalResult() {
+            const simulatedResult = {
+                status: 'unsafe',
+                message: 'Caution: High-risk segments detected.',
+                details: 'Our analysis detected multiple sequences with rapid, high-contrast changes that may trigger photosensitive epilepsy.',
+                thumbnailUrl: `https://placehold.co/1280x720/ef4444/ffffff?text=High+Risk+Video`,
+                duration: 247,
+                riskSegments: [
+                    { start: 0, end: 62, risk: 'low' },
+                    { start: 62, end: 75, risk: 'high' },
+                    { start: 75, end: 150, risk: 'low' },
+                    { start: 150, end: 168, risk: 'medium' },
+                    { start: 168, end: 180, risk: 'high' },
+                    { start: 180, end: 247, risk: 'low' },
+                ]
+            };
+            displayResult(simulatedResult);
+        }
 
         function setLoadingState(isLoading) {
             analyzeButton.disabled = isLoading;
@@ -140,9 +223,9 @@
         }
 
         function displayResult(result) {
+            setLoadingState(false);
             if (result.status === 'error') {
                 resultContainer.innerHTML = `<div class="fade-in bg-gray-100 text-gray-800 p-6 rounded-lg shadow-md"><div class="flex items-center"><div class="flex-shrink-0"><svg class="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg></div><div class="ml-4"><h3 class="text-xl font-bold text-gray-600">${result.message}</h3><p class="mt-1 text-sm">${result.details || ''}</p></div></div></div>`;
-                setLoadingState(false);
                 return;
             }
 
