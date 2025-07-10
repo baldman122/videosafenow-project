@@ -81,12 +81,16 @@ exports.handler = async function(event, context) {
     const seconds = parseInt(matches[3] || 0);
     const durationInSec = (hours * 3600) + (minutes * 60) + seconds;
 
+    // Robustly find the best available thumbnail URL
+    const thumbnails = snippet.thumbnails;
+    const thumbnailUrl = (thumbnails.maxres || thumbnails.standard || thumbnails.high || thumbnails.medium || thumbnails.default).url;
+
     // 4. Send a REAL result back to the website based on the analysis
     const finalResult = {
       status: warningFound ? 'unsafe' : 'safe',
       message: warningFound ? 'Caution: Potential risk detected in video text.' : 'No warnings found in video text.',
       details: warningFound ? 'The video\'s title, tags, or description contain keywords often associated with photosensitive triggers.' : 'Our analysis of the video\'s text metadata did not find any common warning keywords.',
-      thumbnailUrl: snippet.thumbnails.high.url,
+      thumbnailUrl: thumbnailUrl,
       duration: durationInSec,
       riskSegments: [{
         start: 0,
