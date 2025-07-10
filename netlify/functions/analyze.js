@@ -41,7 +41,7 @@ exports.handler = async function(event, context) {
   } catch (error) {
     return { statusCode: 400, body: JSON.stringify({ status: "error", message: error.message })};
   }
-
+  
   // 3. Get REAL Video Metadata using the Official API
   try {
     const response = await youtube.videos.list({
