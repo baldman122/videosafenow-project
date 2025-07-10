@@ -1,8 +1,7 @@
 # This is the final, simplified configuration for Netlify.
+# It relies on Netlify's automatic dependency installation.
 
 [build]
-  # This command explicitly tells Netlify to install the packages from package.json.
-  command = "npm install"
   # The publish directory is the root of your project where index.html lives.
   publish = "."
 
