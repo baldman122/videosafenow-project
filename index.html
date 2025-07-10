@@ -97,52 +97,56 @@
         const buttonText = document.getElementById('button-text');
         const spinner = document.getElementById('spinner');
         const resultContainer = document.getElementById('result-container');
-        let pollingInterval;
 
         form.addEventListener('submit', async function(event) {
             event.preventDefault();
             setLoadingState(true);
-            resultContainer.innerHTML = '';
-
-            // This is the new UI that shows a live checklist and progress bar.
-            // In the future, this will be powered by a real multi-step backend process.
-            startSimulatedAnalysis();
-        });
-
-        function startSimulatedAnalysis() {
+            
+            // Show the checklist UI immediately
             showChecklistUI();
 
-            let progress = 0;
-            const stages = ['info', 'analyzing', 'finalizing', 'done'];
-            let currentStage = 0;
+            // Simulate a short delay for fetching info
+            setTimeout(() => {
+                updateChecklistItem('info', 'complete');
+                updateChecklistItem('analyzing', 'active');
+                updateProgressBar(10); // Show a little progress
+            }, 750);
 
-            if (pollingInterval) clearInterval(pollingInterval);
+            // This is the URL for the Netlify function.
+            const functionURL = '/api/analyze'; 
 
-            pollingInterval = setInterval(() => {
-                progress += 5;
+            try {
+                const response = await fetch(functionURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: urlInput.value }) 
+                });
 
-                if (progress >= 20 && currentStage === 0) {
-                    updateChecklistItem('info', 'complete');
-                    updateChecklistItem('analyzing', 'active');
-                    currentStage++;
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.details || 'An unknown error occurred.');
                 }
-                if (progress > 20 && progress < 95) {
-                    const analysisProgress = ((progress - 20) / 75) * 100;
-                    updateProgressBar(analysisProgress);
-                }
-                if (progress >= 95 && currentStage === 1) {
-                    updateChecklistItem('analyzing', 'complete');
-                    updateProgressBar(100);
-                    updateChecklistItem('finalizing', 'active');
-                    currentStage++;
-                }
-                if (progress >= 100) {
-                    updateChecklistItem('finalizing', 'complete');
-                    clearInterval(pollingInterval);
-                    displayFinalResult();
-                }
-            }, 250);
-        }
+                
+                // Update checklist to show completion
+                updateChecklistItem('analyzing', 'complete');
+                updateProgressBar(100);
+                updateChecklistItem('finalizing', 'active');
+
+                // Short delay before showing final result for better UX
+                setTimeout(() => {
+                    displayResult(result);
+                }, 500);
+
+            } catch (error) {
+                console.error("Failed to fetch analysis:", error);
+                displayResult({ 
+                    status: 'error', 
+                    message: 'Analysis Service Unavailable', 
+                    details: 'Could not connect to the backend server. Please try again later.' 
+                });
+            }
+        });
 
         function showChecklistUI() {
             const checklistHTML = `
@@ -156,7 +160,7 @@
                         <li id="status-analyzing" class="flex items-center text-gray-500">
                             <svg class="h-6 w-6 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                             <div>
-                                <span>Analyzing video frames for Harding Test compliance</span>
+                                <span>Analyzing video metadata for keywords</span>
                                 <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1 hidden">
                                     <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full progress-bar-inner" style="width: 0%"></div>
                                 </div>
@@ -195,25 +199,6 @@
                 progressBarContainer.classList.remove('hidden');
             }
             progressBar.style.width = `${percentage}%`;
-        }
-
-        function displayFinalResult() {
-            const simulatedResult = {
-                status: 'unsafe',
-                message: 'Caution: High-risk segments detected.',
-                details: 'Our analysis detected multiple sequences with rapid, high-contrast changes that may trigger photosensitive epilepsy.',
-                thumbnailUrl: `https://placehold.co/1280x720/ef4444/ffffff?text=High+Risk+Video`,
-                duration: 247,
-                riskSegments: [
-                    { start: 0, end: 62, risk: 'low' },
-                    { start: 62, end: 75, risk: 'high' },
-                    { start: 75, end: 150, risk: 'low' },
-                    { start: 150, end: 168, risk: 'medium' },
-                    { start: 168, end: 180, risk: 'high' },
-                    { start: 180, end: 247, risk: 'low' },
-                ]
-            };
-            displayResult(simulatedResult);
         }
 
         function setLoadingState(isLoading) {
