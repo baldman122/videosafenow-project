@@ -1,17 +1,7 @@
-# This is the definitive configuration file for Netlify.
-# It explicitly tells Netlify how to build the Python function.
-
 [build]
-  # This command tells Netlify to install the libraries from your requirements.txt file.
-  command = "pip install -r requirements.txt"
-  # This tells Netlify that the index.html is in the root of the project.
+  functions = "netlify/functions"
   publish = "."
 
-# This section explicitly configures the functions directory.
-[functions]
-  directory = "netlify/functions"
-
-# This section sets up the URL for your function.
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
