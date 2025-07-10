@@ -93,7 +93,7 @@
                 if (!startResponse.ok) throw new Error(startResult.message || 'Failed to start analysis.');
                 
                 const jobId = startResult.jobId;
-                updateChecklistItem('info', 'complete', `Job ID: ${jobId}`);
+                updateChecklistItem('info', 'complete', `Analysis job started. ID: ${jobId}`);
                 updateChecklistItem('analyzing', 'active');
                 pollForStatus(jobId);
             } catch (error) {
