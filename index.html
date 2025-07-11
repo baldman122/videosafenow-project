@@ -13,15 +13,15 @@
     <style>
         html { scroll-behavior: smooth; }
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .hero-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+       .hero-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeIn 0.6s ease-in-out forwards; }
-        .analysis-timeline-bar div {
+       .fade-in { animation: fadeIn 0.6s ease-in-out forwards; }
+       .analysis-timeline-bar div {
             transition: background-color 0.3s ease, width 0.5s ease;
             white-space: nowrap; overflow: hidden; color: white; font-size: 10px; font-weight: 600;
             display: flex; align-items: center; justify-content: center;
         }
-        .progress-bar-inner { transition: width 0.4s ease-in-out; }
+       .progress-bar-inner { transition: width 0.4s ease-in-out; }
     </style>
 </head>
 <body class="text-gray-800">
@@ -90,7 +90,9 @@
                 });
                 const startResult = await startResponse.json();
 
-                if (!startResponse.ok) throw new Error(startResult.message || 'Failed to start analysis.');
+                if (!startResponse.ok) throw new Error(startResult.message |
+
+| 'Failed to start analysis.');
                 
                 const jobId = startResult.jobId;
                 updateChecklistItem('info', 'complete', `Analysis job started. ID: ${jobId}`);
@@ -159,7 +161,7 @@
         }
 
         function updateProgressBar(percentage) {
-            const progressBarContainer = document.querySelector('#status-analyzing .w-full');
+            const progressBarContainer = document.querySelector('#status-analyzing.w-full');
             const progressBar = document.getElementById('progress-bar');
             if (progressBarContainer.classList.contains('hidden')) progressBarContainer.classList.remove('hidden');
             progressBar.style.width = `${percentage}%`;
@@ -168,13 +170,15 @@
         function setLoadingState(isLoading) {
             document.getElementById('analyze-button').disabled = isLoading;
             document.getElementById('button-text').classList.toggle('hidden', isLoading);
-            document.getElementById('spinner').classList.toggle('hidden', !isLoading);
+            document.getElementById('spinner').classList.toggle('hidden',!isLoading);
         }
 
         function displayResult(result) {
             setLoadingState(false);
             if (result.status === 'error') {
-                resultContainer.innerHTML = `<div class="fade-in bg-gray-100 text-gray-800 p-6 rounded-lg shadow-md"><div class="flex items-center"><div class="flex-shrink-0"><svg class="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg></div><div class="ml-4"><h3 class="text-xl font-bold text-gray-600">${result.message}</h3><p class="mt-1 text-sm">${result.details || ''}</p></div></div></div>`;
+                resultContainer.innerHTML = `<div class="fade-in bg-gray-100 text-gray-800 p-6 rounded-lg shadow-md"><div class="flex items-center"><div class="flex-shrink-0"><svg class="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg></div><div class="ml-4"><h3 class="text-xl font-bold text-gray-600">${result.message}</h3><p class="mt-1 text-sm">${result.details |
+
+| ''}</p></div></div></div>`;
                 return;
             }
 
@@ -195,7 +199,7 @@
                     case 'medium': colorClass = 'bg-yellow-500'; label = 'Med'; break;
                     default: colorClass = 'bg-green-500'; label = 'Low'; break;
                 }
-                return `<div class="${colorClass}" style="width: ${width}%;" title="${segment.risk.charAt(0).toUpperCase() + segment.risk.slice(1)} Risk (${segment.start}s - ${segment.end}s)">${width > 8 ? label : ''}</div>`;
+                return `<div class="${colorClass}" style="width: ${width}%;" title="${segment.risk.charAt(0).toUpperCase() + segment.risk.slice(1)} Risk (${segment.start}s - ${segment.end}s)">${width > 8? label : ''}</div>`;
             }).join('');
 
             const resultHTML = `
