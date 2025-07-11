@@ -90,9 +90,7 @@
                 });
                 const startResult = await startResponse.json();
 
-                if (!startResponse.ok) throw new Error(startResult.message |
-
-| 'Failed to start analysis.');
+              if (!startResponse.ok) throw new Error(startResult.message || 'Failed to start analysis.');
                 
                 const jobId = startResult.jobId;
                 updateChecklistItem('info', 'complete', `Analysis job started. ID: ${jobId}`);
