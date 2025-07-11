@@ -173,12 +173,22 @@
 
         function displayResult(result) {
             setLoadingState(false);
-            if (result.status === 'error') {
-                resultContainer.innerHTML = `<div class="fade-in bg-gray-100 text-gray-800 p-6 rounded-lg shadow-md"><div class="flex items-center"><div class="flex-shrink-0"><svg class="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg></div><div class="ml-4"><h3 class="text-xl font-bold text-gray-600">${result.message}</h3><p class="mt-1 text-sm">${result.details |
-
-| ''}</p></div></div></div>`;
-                return;
-            }
+          if (result.status === 'error') {
+    resultContainer.innerHTML = `<div class="fade-in bg-gray-100 text-gray-800 p-6 rounded-lg shadow-md">
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                <svg class="h-12 w-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.054 0 1.918-.816 1.995-1.85l.007-.15V6a2 2 0 00-1.85-1.995L19 4H5a2 2 0 00-1.995 1.85L3 6v12c0 1.054.816 1.918 1.85 1.995L5 20zm7-8a1 1 0 11-2 0 1 1 0 012 0z" />
+                </svg>
+            </div>
+            <div class="ml-4">
+                <h3 class="text-lg font-bold text-red-600">${result.message}</h3>
+                <p class="mt-2">${result.details ? result.details : ''}</p>
+            </div>
+        </div>
+    </div>`;
+    return;
+}
 
             let overallIcon, overallTitleColor;
             if (result.status === 'safe') {
